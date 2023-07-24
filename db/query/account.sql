@@ -17,9 +17,16 @@ ORDER BY id
 LIMIT $1
 OFFSET $2;
 
--- pake exec soalnya dia gak return data apa apa
 
--- name: UpdateAccount :exec
+
+-- name: UpdateAccount :one
 UPDATE accounts 
 SET balance = $2
+WHERE id = $1
+RETURNING *;
+
+-- pake :exec soalnya dia gak return data apa apa
+
+-- name: DeleteAccount :exec
+DELETE FROM accounts 
 WHERE id = $1;
