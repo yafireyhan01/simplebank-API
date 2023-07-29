@@ -46,10 +46,9 @@ jobs:
 
     - name: Install golang-migrate
       run: |
-        scoop install migrate
-        sudo mv migrate.linux-amd64 /usr/bin/
+        curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-amd64.tar.gz | tar xvz
+        sudo mv migrate.linux-amd64 /usr/bin/migrate
         wich migrate
-# curl -L https://github.com/golang-migrate/migrate/releases/download/v4.12.2/migrate.linux-amd64.tar.gz | tar xvz
 # sudo mv migrate.linux-amd64 /usr/bin/migrate
 
     - name: Run migrations
