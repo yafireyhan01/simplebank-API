@@ -22,6 +22,8 @@ func NewServer(store *db.Store) *Server {
 	// get aspecific account by ID
 	router.GET("/accounts/:id", server.getAccount)
 	router.GET("/accounts", server.listAccount)
+	// delete account by id
+	router.DELETE("/accounts/:id", server.deleteAccount)
 
 	server.router = router
 	return server
@@ -35,4 +37,8 @@ func (server *Server) Start(address string) error {
 
 func errorResponse(err error) gin.H {
 	return gin.H{"error": err.Error()}
+}
+
+func deleteResponse() gin.H {
+	return gin.H{"succes": "account was deleted"}
 }

@@ -94,3 +94,31 @@ func (server *Server) listAccount(ctx *gin.Context) {
 	// if no error
 	ctx.JSON(http.StatusOK, accounts)
 }
+
+// DELETE ACCOUNT BY ID
+type deleteAccountRequest struct {
+	ID int64 `uri:"id" binding:"required,min=1"` // min=1 is for cant get lower than 1
+}
+
+// delete  account by ID
+func (server *Server) deleteAccount(ctx *gin.Context) {
+	var req deleteAccountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	_, err := server.store.GetAccount(ctx, req.ID)
+	if err != nil {
+		// if account id wasnt found
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
+	_ = server.store.DeleteAccount(ctx, req.ID)
+
+	ctx.JSON(http.StatusOK, deleteResponse())
+
+}
