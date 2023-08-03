@@ -4,6 +4,8 @@ import (
 	db "simplebank/db/sqlc"
 
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 )
 
 // Server servers HTTP request for our banking service
@@ -17,6 +19,14 @@ func NewServer(store db.Store) *Server {
 	server := &Server{store: store}
 	router := gin.Default()
 
+	// register the custom validator with gin (func IsSupportedCurrency)
+	// convert the output to a validator.Validate pointer
+	if v, ok := binding.Validator.Engine().(*validator.Validate); ok {
+		// if its okay then we call:
+		// currency is the name of validation tag
+		v.RegisterValidation("currency", validCurrency)
+	}
+
 	// create new account
 	router.POST("/accounts", server.createAccount)
 	// get aspecific account by ID
@@ -27,6 +37,8 @@ func NewServer(store db.Store) *Server {
 	router.DELETE("/accounts/:id", server.deleteAccount)
 	// update account by id
 	// router.PUT("/accounts/:id", server.updateAccount)
+	// create a transfer
+	router.POST("/transfers", server.createTransfer)
 
 	server.router = router
 	return server
