@@ -36,7 +36,7 @@ packages:
     schema: "./db/migration"
     engine: "postgresql"
     emit_prepared_queries: false
-    emit_interface: false #to mock database for testing higher level function
+    emit_interface: true #to mock database for testing higher level function
     emit_exact_table_names: false
     emit_empty_slices: true
     emit_exported_queries: false
