@@ -123,39 +123,39 @@ func (server *Server) deleteAccount(ctx *gin.Context) {
 
 }
 
-type UpdateAccountRequest struct {
-	ID int64 `uri:"id"` // min=1 is for cant get lower than 1
+// type UpdateAccountRequest struct {
+// 	ID int64 `uri:"id"` // min=1 is for cant get lower than 1
 
-	Balance int64 `json:"balance" binding:"required,min=1""`
-}
+// 	Balance int64 `json:"balance" binding:"required,min=1""`
+// }
 
-// update account
-func (server *Server) updateAccount(ctx *gin.Context) {
-	var req UpdateAccountRequest
-	if err := ctx.ShouldBindUri(&req); err != nil {
-		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-		return
-	}
-	account, err := server.store.GetAccountForUpdate(ctx, req.ID)
-	if err != nil {
+// // update account
+// func (server *Server) updateAccount(ctx *gin.Context) {
+// 	var req UpdateAccountRequest
+// 	if err := ctx.ShouldBindUri(&req); err != nil {
+// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+// 		return
+// 	}
+// 	account, err := server.store.GetAccountForUpdate(ctx, req.ID)
+// 	if err != nil {
 
-		if err == sql.ErrNoRows {
-			ctx.JSON(http.StatusNotFound, errorResponse(err))
-			return
-		}
-		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-		return
-	}
+// 		if err == sql.ErrNoRows {
+// 			ctx.JSON(http.StatusNotFound, errorResponse(err))
+// 			return
+// 		}
+// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 		return
+// 	}
 
-	// arg := db.UpdateAccountParams{
-	// 	Balance: req.Balance,
-	// }
+// 	// arg := db.UpdateAccountParams{
+// 	// 	Balance: req.Balance,
+// 	// }
 
-	// account, err = server.store.UpdateAccount(ctx, arg)
-	// if err != nil {
-	// 	ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-	// 	return
-	// }
+// 	// account, err = server.store.UpdateAccount(ctx, arg)
+// 	// if err != nil {
+// 	// 	ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+// 	// 	return
+// 	// }
 
-	ctx.JSON(http.StatusOK, account)
-}
+// 	ctx.JSON(http.StatusOK, account)
+// }
