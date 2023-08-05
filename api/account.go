@@ -123,50 +123,39 @@ func (server *Server) deleteAccount(ctx *gin.Context) {
 
 }
 
-// type UpdateAccountRequest struct {
-// 	// same as create account params but without balance (bcs it initial balance should always 0)
-// 	ID int64 `uri:"id"` // min=1 is for cant get lower than 1
-// 	// Owner    string `json:"owner" binding:"required"`
-// 	Balance int64 `json:"balance binding:"required,min=1""`
-// 	// Currency string `json:"currency" binding:"required,oneof=USD EUR"`
-// }
+type UpdateAccountRequest struct {
+	ID int64 `uri:"id"` // min=1 is for cant get lower than 1
 
-// // update account
-// func (server *Server) updateAccount(ctx *gin.Context) {
-// 	var req UpdateAccountRequest
-// 	if err := ctx.ShouldBindUri(&req); err != nil {
-// 		ctx.JSON(http.StatusBadRequest, errorResponse(err))
-// 		return
-// 	}
-// 	account, err := server.store.GetAccountForUpdate(ctx, req.ID)
-// 	if err != nil {
-// 		// if account id wasnt found
-// 		if err == sql.ErrNoRows {
-// 			ctx.JSON(http.StatusNotFound, errorResponse(err))
-// 			return
-// 		}
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 		return
-// 	}
-// 	// if err != nil {
-// 	// 	ctx.JSON(http.StatusBadRequest, errorResponse(err))
-// 	// }
+	Balance int64 `json:"balance" binding:"required,min=1""`
+}
 
-// 	arg := db.UpdateAccountParams{
-// 		Balance: req.Balance,
-// 	}
+// update account
+func (server *Server) updateAccount(ctx *gin.Context) {
+	var req UpdateAccountRequest
+	if err := ctx.ShouldBindUri(&req); err != nil {
+		ctx.JSON(http.StatusBadRequest, errorResponse(err))
+		return
+	}
+	account, err := server.store.GetAccountForUpdate(ctx, req.ID)
+	if err != nil {
 
-// 	account, err = server.store.UpdateAccount(ctx, arg)
-// 	if err != nil {
-// 		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
-// 		return
-// 	}
+		if err == sql.ErrNoRows {
+			ctx.JSON(http.StatusNotFound, errorResponse(err))
+			return
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+		return
+	}
 
-// 	// account2 := db.UpdateAccountParams{
-// 	// 	Balance: req.Balance,
-// 	// }
+	// arg := db.UpdateAccountParams{
+	// 	Balance: req.Balance,
+	// }
 
-// 	// account, _ := server.store.UpdateAccount(ctx, account2)
+	// account, err = server.store.UpdateAccount(ctx, arg)
+	// if err != nil {
+	// 	ctx.JSON(http.StatusInternalServerError, errorResponse(err))
+	// 	return
+	// }
 
-// 	ctx.JSON(http.StatusOK, account)
-// }
+	ctx.JSON(http.StatusOK, account)
+}
