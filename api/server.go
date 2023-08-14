@@ -1,7 +1,11 @@
 package api
 
 import (
+	"fmt"
 	db "simplebank/db/sqlc"
+	"simplebank/util"
+
+	"simplebank/token"
 
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
@@ -10,14 +14,24 @@ import (
 
 // Server servers HTTP request for our banking service
 type Server struct {
-	store  db.Store
-	router *gin.Engine //this router will help to send each API req to the correct handler for processing
+	config     util.Config
+	store      db.Store
+	tokenMaker token.Maker
+	router     *gin.Engine //this router will help to send each API req to the correct handler for processing
 }
 
 // Newserver creates a new HTTP server and setup routing.
-func NewServer(store db.Store) *Server {
-	server := &Server{store: store}
-	router := gin.Default()
+func NewServer(config util.Config, store db.Store) (*Server, error) {
+	tokenMaker, err := token.NewPasetoMaker(config.TokenSymmetricKey)
+	if err != nil {
+		return nil, fmt.Errorf("cannot create token maker: %w", err)
+	} // nil server
+
+	server := &Server{
+		config:     config,
+		store:      store,
+		tokenMaker: tokenMaker,
+	}
 
 	// register the custom validator with gin (func IsSupportedCurrency)
 	// convert the output to a validator.Validate pointer
@@ -26,6 +40,14 @@ func NewServer(store db.Store) *Server {
 		// currency is the name of validation tag
 		v.RegisterValidation("currency", validCurrency)
 	}
+
+	server.setupRouter()
+	return server, err
+
+}
+
+func (server *Server) setupRouter() {
+	router := gin.Default()
 
 	// create new account
 	router.POST("/accounts", server.createAccount)
@@ -41,10 +63,10 @@ func NewServer(store db.Store) *Server {
 	router.POST("/transfers", server.createTransfer)
 	// create new user
 	router.POST("/users", server.createUser)
+	// login request
+	router.POST("/users/login", server.loginUser)
 
 	server.router = router
-	return server
-
 }
 
 // Start run the HTTP server on a specific address
